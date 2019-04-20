@@ -24,8 +24,53 @@ classdef ExplorationQuadTree < handle
                 delta = pos-center;
                 q = vec2Quadrant(delta);
                 path(idx) = q;
-                %TODO
-                error('not ready')
+                
+                
+                switch q
+                    case 1
+                        delta = [1;1];
+                    case 2
+                        delta = [-1;1];
+                    case 3
+                        delta = [-1;-1];
+                    case 4
+                        delta = [1;-1];
+                    otherwise
+                        error('wtf');
+                end
+                
+                center = center + delta * currentWidth/4;
+                
+                currentWidth = currentWidth/2;
+                
+            end
+        end
+        
+        function [pos] = path2Position(obj, path)
+            
+            currentWidth = obj.width;
+            pos = [0;0];
+            
+            for q = path
+                
+                switch q
+                    case 1
+                        delta = [1;1];
+                    case 2
+                        delta = [-1;1];
+                    case 3
+                        delta = [-1;-1];
+                    case 4
+                        delta = [1;-1];
+                    otherwise
+                        error('wtf');
+                end
+                
+                
+                pos = pos + delta * currentWidth/4;
+                
+                currentWidth = currentWidth/2;
+                
             end
         end
         

@@ -14,10 +14,67 @@ classdef ExplorationQuadTree < handle
             obj.levels = levels;
         end
         
-        % given a position, this returns a quadrant path.
+        % given a position, this returns a quadrant number path.
         function [path] = position2Path(obj, pos, level)
-            path = 
+            path = ones(1, level);
+            
+            center = [0;0];
+            currentWidth = obj.width;
+            for idx = (1:level)
+                delta = pos-center;
+                q = vec2Quadrant(delta);
+                path(idx) = q;
+                
+                
+                switch q
+                    case 1
+                        delta = [1;1];
+                    case 2
+                        delta = [-1;1];
+                    case 3
+                        delta = [-1;-1];
+                    case 4
+                        delta = [1;-1];
+                    otherwise
+                        error('wtf');
+                end
+                
+                center = center + delta * currentWidth/4;
+                
+                currentWidth = currentWidth/2;
+                
+            end
         end
+        
+        function [pos] = path2Position(obj, path)
+            
+            for q
+                delta = pos-center;
+                q = vec2Quadrant(delta);
+                path(idx) = q;
+                
+                switch q
+                    case 1
+                        delta = [1;1];
+                    case 2
+                        delta = [-1;1];
+                    case 3
+                        delta = [-1;-1];
+                    case 4
+                        delta = [1;-1];
+                    otherwise
+                        error('wtf');
+                end
+                
+                
+                center = center + delta * currentWidth/4;
+                
+                currentWidth = currentWidth/2;
+                
+            end
+        end
+        
+        
     end
 end
 
