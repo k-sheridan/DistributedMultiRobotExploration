@@ -12,6 +12,10 @@ classdef Map < handle
             % take the first channel and call it the occupancy grid.
             obj.occupancyGrid = uint8((img(:, :, 1)>0)*OccupancyState.OCCUPIED);
             obj.mapResolution = resolution;
+            
+            % the map must be square for the quadtree.
+            sz = size(obj.occupancyGrid);
+            assert(sz(1) == sz(2));
         end
         
         % converts [x;y] coordinate to the occupancy grid index

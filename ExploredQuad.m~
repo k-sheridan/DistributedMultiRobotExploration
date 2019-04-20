@@ -5,7 +5,7 @@ classdef ExploredQuad < handle
         quadrants; % a set of 4 quadrants. each is the same type as this
         center; % the center position (m) of this quad
         width; % the width of this quad (m)
-        depth; % the depth of the quadtree. 0 is the top...
+        depth; % the depth of the quadtree. 1 is the top...
         explored; % boolean stating if this quad has been explored
     end
     
@@ -22,10 +22,10 @@ classdef ExploredQuad < handle
                 levelsToGo = levelsToGo - 1;
                 depth = depth + 1;
                 
-                q1 = ExploredQuad(center + [width/4; width/4], width/2, depth, levelsToGo);
-                q2 = ExploredQuad(center + [-width/4; width/4], width/2, depth, levelsToGo);
-                q3 = ExploredQuad(center + [-width/4; -width/4], width/2, depth, levelsToGo);
-                q4 = ExploredQuad(center + [width/4; -width/4], width/2, depth, levelsToGo);
+                q1 = ExploreQuad(center + [width/4; width/4], width/2, depth, levelsToGo);
+                q2 = ExploreQuad(center + [-width/4; width/4], width/2, depth, levelsToGo);
+                q3 = ExploreQuad(center + [-width/4; -width/4], width/2, depth, levelsToGo);
+                q4 = ExploreQuad(center + [width/4; -width/4], width/2, depth, levelsToGo);
                 
                 obj.quadrants = {q1, q2, q3, q4};
                 
