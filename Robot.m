@@ -19,7 +19,7 @@ classdef Robot < handle
         localMap; % a local occupancy grid the robot will update as it explores.
         localExplorationTree; % a quad tree used to efficiently communicate map exploration status.
         
-        linesOfExploration; % a map associating each robot with a line of exploration
+        linesOfExploration; % a map associating each robot with a line of exploration (local frame)
     end
     
     methods

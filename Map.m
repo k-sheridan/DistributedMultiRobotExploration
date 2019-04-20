@@ -55,6 +55,23 @@ classdef Map < handle
             [r, c] = obj.position2MapIndex(pos);
             obj.occupancyGrid(r, c) = occ;
         end
+        
+        % tests if a square region of the occupancy grid has been explored
+        function [explored] = isRegionExplored(obj, center, width)
+            [targetRow, targetCol] = obj.position2MapIndex(center);
+            
+            % convert the search radius into a pixel/occupancy unit
+            pixelSearchRadius = round(width / obj.mapResolution);
+            
+            sz = size(obj.occupancyGrid);
+            
+            rowUpper = min(targetRow+pixelSearchRadius, sz(1));
+            rowLower = max(targetRow-pixelSearchRadius, 1);
+            colUpper = min(targetCol+pixelSearchRadius, sz(2));
+            colLower = max(targetCol-pixelSearchRadius, 1);
+            
+            explored = ~any(any(obj.occupancyGrid(rowLower:rowUpper, colLower:colUpper) == OccupancyState.UNKOWN));
+        end
     end
 end
 
