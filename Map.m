@@ -1,4 +1,4 @@
-classdef Map
+classdef Map < handle
     %stores occupancy grid and exploration status
     
     properties
@@ -10,7 +10,7 @@ classdef Map
         function obj = Map(pathToMapImage, resolution)
             img = imread(pathToMapImage);
             % take the first channel and call it the occupancy grid.
-            obj.occupancyGrid = (img(:, :, 1)>0)*OccupancyState.OCCUPIED;
+            obj.occupancyGrid = uint8((img(:, :, 1)>0)*OccupancyState.OCCUPIED);
             obj.mapResolution = resolution;
         end
         
@@ -28,6 +28,17 @@ classdef Map
             sz = size(obj.occupancyGrid);
             centerIdx = sz/2;
             pos = ([row;col] - centerIdx') * obj.mapResolution;
+        end
+        
+        % sets the entire occupancy grid to unknown
+        function [] = reset(obj)
+            sz = size(obj.occupancyGrid);
+            obj.occupancyGrid = ones(sz(1), sz(2)) * OccupancyState.UNKOWN;
+        end
+        
+        % checks if a given map index is a frontier
+        function [frontier] = isFrontier(obj, row, col)
+            frontier = (obj.occupancyGrid(row, col) == OccupancyState.UNKOWN) && any(any(obj.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNOCCUPIED));
         end
     end
 end
