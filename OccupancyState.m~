@@ -1,8 +1,0 @@
-classdef OccupancyState
-    enumeration
-        UNKOWN=128,
-        OCCUPIED=255,
-        UNO
-    end
-end
-

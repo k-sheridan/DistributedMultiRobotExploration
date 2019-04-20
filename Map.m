@@ -44,6 +44,17 @@ classdef Map < handle
         function [frontier] = isFrontier(obj, row, col)
             frontier = (obj.occupancyGrid(row, col) == OccupancyState.UNKOWN) && any(any(obj.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNOCCUPIED));
         end
+        
+        % get the occupancy state of a position
+        function [occ] = get(obj, pos)
+            [r, c] = obj.position2MapIndex(pos);
+            occ = obj.occupancyGrid(r, c);
+        end
+        
+        function [] = set(obj, pos, occ)
+            [r, c] = obj.position2MapIndex(pos);
+            obj.occupancyGrid(r, c) = occ;
+        end
     end
 end
 
