@@ -7,11 +7,16 @@ classdef Map < handle
     end
     
     methods
+        
         function obj = Map(pathToMapImage, resolution)
             img = imread(pathToMapImage);
             % take the first channel and call it the occupancy grid.
             obj.occupancyGrid = uint8((img(:, :, 1)>0)*OccupancyState.OCCUPIED);
             obj.mapResolution = resolution;
+            
+            % the map must be square for the quadtree.
+            sz = size(obj.occupancyGrid);
+            assert(sz(1) == sz(2));
         end
         
         % converts [x;y] coordinate to the occupancy grid index
@@ -30,13 +35,48 @@ classdef Map < handle
             pos = ([row;col] - centerIdx') * obj.mapResolution;
         end
         
+        function [] = initialize(obj, size, resolution)
+            obj.occupancyGrid = ones(size) * 
+        end
+        
         % sets the entire occupancy grid to unknown
         function [] = reset(obj)
             sz = size(obj.occupancyGrid);
             obj.occupancyGrid = ones(sz(1), sz(2)) * OccupancyState.UNKOWN;
         end
         
-        % checks if a given index 
+        % checks if a given map index is a frontier
+        function [frontier] = isFrontier(obj, row, col)
+            frontier = (obj.occupancyGrid(row, col) == OccupancyState.UNKOWN) && any(any(obj.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNOCCUPIED));
+        end
+        
+        % get the occupancy state of a position
+        function [occ] = get(obj, pos)
+            [r, c] = obj.position2MapIndex(pos);
+            occ = obj.occupancyGrid(r, c);
+        end
+        
+        function [] = set(obj, pos, occ)
+            [r, c] = obj.position2MapIndex(pos);
+            obj.occupancyGrid(r, c) = occ;
+        end
+        
+        % tests if a square region of the occupancy grid has been explored
+        function [explored] = isRegionExplored(obj, center, width)
+            [targetRow, targetCol] = obj.position2MapIndex(center);
+            
+            % convert the search radius into a pixel/occupancy unit
+            pixelSearchRadius = round(width / obj.mapResolution);
+            
+            sz = size(obj.occupancyGrid);
+            
+            rowUpper = min(targetRow+pixelSearchRadius, sz(1));
+            rowLower = max(targetRow-pixelSearchRadius, 1);
+            colUpper = min(targetCol+pixelSearchRadius, sz(2));
+            colLower = max(targetCol-pixelSearchRadius, 1);
+            
+            explored = ~any(any(obj.occupancyGrid(rowLower:rowUpper, colLower:colUpper) == OccupancyState.UNKOWN));
+        end
     end
 end
 

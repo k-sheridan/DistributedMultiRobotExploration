@@ -7,6 +7,7 @@ classdef Map < handle
     end
     
     methods
+        
         function obj = Map(pathToMapImage, resolution)
             img = imread(pathToMapImage);
             % take the first channel and call it the occupancy grid.
@@ -32,6 +33,11 @@ classdef Map < handle
             sz = size(obj.occupancyGrid);
             centerIdx = sz/2;
             pos = ([row;col] - centerIdx') * obj.mapResolution;
+        end
+        
+        function [] = initialize(obj, size, resolution)
+            obj.occupancyGrid = ones(size) * OccupancyState.UNKOWN;
+            obj.mapResolution = resolution;
         end
         
         % sets the entire occupancy grid to unknown
