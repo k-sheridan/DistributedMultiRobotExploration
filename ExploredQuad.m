@@ -1,5 +1,7 @@
 classdef ExploredQuad < handle
     % The nested datatype describing how the map has been explored
+    % follows the standard quadrant layout, quadrant angle = (pi/4 +
+    % n*pi/2); n = quadrant number
     
     properties
         quadrants; % a set of 4 quadrants. each is the same type as this

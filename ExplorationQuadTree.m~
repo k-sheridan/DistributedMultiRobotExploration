@@ -14,22 +14,10 @@ classdef ExplorationQuadTree < handle
             obj.levels = levels;
         end
         
-        % given a position, this returns a quadrant number path.
+        % given a position, this returns a quadrant path.
         function [path] = position2Path(obj, pos, level)
-            path = ones(1, level);
-            
-            center = [0;0];
-            currentWidth = obj.width;
-            for idx = (1:level)
-                delta = pos-center;
-                q = vec2Quadrant(delta);
-                path(idx) = q;
-                %TODO
-                error('not ready')
-            end
+            path = 
         end
-        
-        
     end
 end
 
