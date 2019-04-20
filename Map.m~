@@ -20,14 +20,7 @@ classdef Map
             centerIdx = sz/2;
             temp = round(centerIdx' + pos/obj.mapResolution);
             row = temp(1);
-            col = temp(2);
-        end
-        
-        % converts row column to coordinate
-        function [pos] = mapIndex2Position(obj, row, col)
-            sz = size(obj.occupancyGrid);
-            centerIdx = sz/2;
-            pos = ([row;col] - centerIdx') * obj.mapResolution;
+            col = 
         end
     end
 end

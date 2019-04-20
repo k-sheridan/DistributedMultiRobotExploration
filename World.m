@@ -3,13 +3,15 @@ classdef World
     % positions.
     
     properties
-        
+        map % occupancy grid of the world
     end
     
     methods
         function obj = World()
             
         end
+        
+        
     end
 end
 
