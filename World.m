@@ -7,7 +7,7 @@ classdef World
     end
     
     methods
-        function obj = World()
+        function obj = World(pathToMapImage, nRobots)
             
         end
         

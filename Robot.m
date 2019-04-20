@@ -2,6 +2,9 @@ classdef Robot < handle
     %Generic 2D robot explorer
     
     properties
+        % ID
+        id = -1;
+        
         % Ranges
         senseRange = 10;
         communicationRange = 10;
@@ -15,13 +18,19 @@ classdef Robot < handle
         
         localMap; % a local occupancy grid the robot will update as it explores.
         localExplorationTree; % a quad tree used to efficiently communicate map exploration status.
+        
+        linesOfExploration; % a map associating each robot with a line of exploration
     end
     
     methods
         % initialize the robot state estimate
-        function obj = Robot()
+        function obj = Robot(id)
             obj.localState = RobotState([0;0;0], diag([1,1,1] * 1e-24)); % highly certain.
             obj.startingState = RobotState([0;0;0], diag([1, 1, 1] * 1e6)); % highly uncertain.
+            
+            obj.id = id; % unique id assigned to each robot.
+            
+            
         end
     end
 end
