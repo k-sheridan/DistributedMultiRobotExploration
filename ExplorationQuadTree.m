@@ -74,6 +74,49 @@ classdef ExplorationQuadTree < handle
             end
         end
         
+        % answers if this position was explored
+        function [explored] = get(obj, pos)
+            path = obj.position2Path(pos, obj.levels);
+            
+            currentQuad = obj.tree;
+            explored = false;
+            for q = path
+                if currentQuad.explored
+                    explored = true;
+                    return;
+                end
+                
+                if isempty(currentQuad.quadrants)
+                    return;
+                end
+                
+                currentQuad = currentQuad.quadrants{q};
+            end
+        end
+        
+        
+        % answers if this position was explored
+        function [] = set(obj, pos, explored, level)
+            path = obj.position2Path(pos, level);
+            
+            currentQuad = obj.tree;
+            
+            for q = path
+                if isempty(currentQuad.quadrants)
+                    return;
+                end
+                currentQuad = currentQuad.quadrants{q};
+                
+                if currentQuad.depth == level
+                    if explored
+                        currentQuad.setExplored();
+                    else
+                        currentQuad.explored = false;
+                    end
+                end
+            end
+        end
+        
         
     end
 end

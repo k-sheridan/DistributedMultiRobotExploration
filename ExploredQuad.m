@@ -34,6 +34,20 @@ classdef ExploredQuad < handle
             end
         end
         
+        
+        % recursive fcn which sets itself and all children to explored.
+        function [] = setExplored(obj)
+            obj.explored = true;
+            
+            if isempty(obj.quadrants)
+                return;
+            end
+            
+            for idx = (1:4)
+                obj.quadrants{idx}.setExplored();
+            end
+        end
+        
     end
 end
 
