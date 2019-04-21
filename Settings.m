@@ -7,6 +7,7 @@ classdef Settings
         FORWARD_VELOCITY = 0.5;
         ROBOT_RADIUS = 1;
         DEFAULT_EXPLORATION_RADIUS = 20;
+        WAYPOINT_DISTANCE_THRESHOLD = 1;
     end
 end
 

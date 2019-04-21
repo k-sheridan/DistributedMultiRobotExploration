@@ -41,8 +41,8 @@ classdef Robot < handle
         end
         
         % using the current state estimate, drive the vehicle and or plan a
-        % new path.
-        function [] = motionUpdate(obj)
+        % new path. returns a change in state for the simulation.
+        function [dx] = motionUpdate(obj, dt)
             
             % create a new path to a frontier if there is no more to drive.
             if isempty(obj.waypoints)
@@ -61,8 +61,37 @@ classdef Robot < handle
                 
                 
                 % generate a path to the selected frontier.
+                obj.waypoints = obj.generatePath(obj.localState.pos, frontierPos);
             end
             
+            
+            % now that there is a path to follow, check how far we have
+            % already gone, and move towards next goal...
+            stopFlag = false;
+            while ~stopFlag
+                if norm(obj.waypoints(1) - obj.localState.pos) < Settings.WAYPOINT_DISTANCE_THRESHOLD
+                    obj.waypoints = obj.waypoints(1:2, 2:end); % cut the first waypoint
+                else
+                    stopFlag = true;
+                end
+            end
+            
+            % move towards the goal
+            delta = obj.waypoints(1:2, 1) - obj.localState.pos;
+            dist = norm(delta);
+            newTheta = atan2(delta(2), delta(1));
+            
+            newDist = min(Settings.FORWARD_VELOCITY*dt, dist);
+            
+            if dist < 1e-16
+                dPos = [0;0];
+            else
+                dPos = delta/dist * newDist;
+            end
+            
+            dTheta = newTheta - obj.localState.theta;
+            
+            dx = [dPos; dTheta];
         end
         
         % update the local occupancy grid and exploration tree using the

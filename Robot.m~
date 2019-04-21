@@ -41,13 +41,45 @@ classdef Robot < handle
         end
         
         % using the current state estimate, drive the vehicle and or plan a
-        % new path.
-        function [] = motionUpdate(obj)
+        % new path. returns a change in state for the simulation.
+        function [dx] = motionUpdate(obj, dt)
             
-            % follow the waypoints
+            % create a new path to a frontier if there is no more to drive.
             if isempty(obj.waypoints)
-                %
+                % find the best frontier to explore.
+                [frontierPos, nFrontiers] = findBestFrontier(obj, obj.localState.pos, Settings.DEFAULT_EXPLORATION_RADIUS);
+                
+                if ~nFrontiers
+                    fprintf('No Frontiers in the local area... big search\n');
+                    [frontierPos, nFrontiers] = findBestFrontier(obj, obj.localState.pos, -1);
+                    
+                    if ~nFrontiers
+                        fprintf('Exploration Finished!');
+                        return;
+                    end
+                end
+                
+                
+                % generate a path to the selected frontier.
+                obj.waypoints = obj.generatePath(obj.localState.pos, frontierPos);
             end
+            
+            
+            % now that there is a path to follow, check how far we have
+            % already gone, and move towards next goal...
+            stopFlag = false;
+            while ~stopFlag
+                if norm(obj.waypoints(1) - obj.localState.pos) < Settings.WAYPOINT_DISTANCE_THRESHOLD
+                    obj.waypoints = obj.waypoints(1:2, 2:end); % cut the first waypoint
+                else
+                    stopFlag = true;
+                end
+            end
+            
+            % move towards the goal
+            delta = obj.waypoints(1:2, 1) - obj.localState.pos;
+            
+            length
             
         end
         
@@ -99,6 +131,28 @@ classdef Robot < handle
         function [] = communicationUpdate(obj)
         end
         
+        
+        % generate a star path. inputs and outputs are in the local frame
+        % in meters.
+        function [waypoints] = generatePath(obj, startingPos, goalPos)
+            [startRow, startCol] = obj.localMap.position2MapIndex(startingPos);
+            [goalRow, goalCol] = obj.localMap.position2MapIndex(goalPos);
+            
+            sz = size(obj.localMap.occupancyGrid);
+            goalReg = zeros(sz(1));
+            goalReg(goalRow, goalCol) = 1;
+            
+            [aStarWaypoints] = ASTARPATH(startCol, startRow, obj.localMap.occupancyGrid, goalReg, 8);
+            
+            waypoints = zeros(2, length(aStarWaypoints));
+            
+            for idx = (1:length(aStarWaypoints))
+                waypoints(1:2, idx) = obj.localMap.mapIndex2Position(aStarWaypoints(idx, 1), aStarWaypoints(idx, 2));
+            end
+            
+            % flip the waypoints
+            waypoints = [waypoints(1:2, end:-1:1)];
+        end
         
     end
 end

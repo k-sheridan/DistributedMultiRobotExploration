@@ -4,6 +4,8 @@ function OptimalPath=ASTARPATH(StartX,StartY,MAP,GoalRegister,Connecting_Distanc
 
 %FINDING ASTAR PATH IN AN OCCUPANCY GRID
 
+% if there is no solution, this will hang infinitely....
+
 
 %nNeighboor=3;
 % Preallocation of Matrices
