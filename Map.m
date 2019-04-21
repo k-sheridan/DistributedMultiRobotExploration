@@ -27,11 +27,11 @@ classdef Map < handle
         function [row, col] = position2MapIndex(obj, pos)
             sz = size(obj.occupancyGrid);
             
-            ratio = ((pos + (sz(1)*obj.mapResolution)/2) / (sz(1)*obj.mapResolution)/2)
+            ratio = ((pos + (sz(1)*obj.mapResolution)/2) / (sz(1)*obj.mapResolution))
             
             temp = round([1;1] + (sz(1)-1) * ratio);
-            row = temp(1);
-            col = temp(2);
+            row = temp(2);
+            col = temp(1);
         end
         
         % converts row column to coordinate

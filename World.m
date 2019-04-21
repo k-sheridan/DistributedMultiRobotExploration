@@ -12,7 +12,7 @@ classdef World
         function obj = World(pathToMapImage, mapResolution, nRobots)
             obj.map = Map(pathToMapImage, mapResolution);
             
-            rng(10); % make deterministic
+            rng(1); % make deterministic
             
             % create all robots
             obj.robots = {};
