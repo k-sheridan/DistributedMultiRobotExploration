@@ -31,7 +31,9 @@ classdef LinesOfExploration
                 
                 cost = cost + exp(-d);
             end
-            cost = cost / length(obj.lineMap.values);
+            if ~isempty(obj.lineMap.values)
+                cost = cost / length(obj.lineMap.values);
+            end
         end
         
     end
