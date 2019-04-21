@@ -20,8 +20,26 @@ classdef World
             mapSize = length(obj.map.occupancyGrid)*2;
             for id = (1:nRobots)
                 obj.robots{id} = Robot(id, mapSize, mapResolution);
-                obj.robotGroundTruthStates{id} = Rob
+                
+                % find a valid random starting position
+                positionValid = false;
+                while (~positionValid)
+                    width = length(obj.map.occupancyGrid) * mapResolution;
+                    position = [(rand()*2 - 1); (rand()*2 - 1)] * width/2;
+                    
+                    if ~obj.map.isRegionOccupied(position, Settings.ROBOT_RADIUS)
+                        positionValid = true;
+                        
+                        obj.robotGroundTruthStates{id} = RobotState([position; rand()*2*pi], diag([0;0;0]));
+                    end
+                end
             end
+        end
+        
+        % creates a lidar measurement around the robot state.
+        function [lidarMeasurement] = generateLidarMeasurement(obj, robotState)
+            % s = theta*r => mapRes = dTheta*senseRange => dTheta = mapRe
+            nBearings
         end
         
         

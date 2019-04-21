@@ -27,10 +27,35 @@ classdef World
                     width = length(obj.map.occupancyGrid) * mapResolution;
                     position = [(rand()*2 - 1); (rand()*2 - 1)] * width/2;
                     
-                    if obj.map.get(position) == OccupancyState.UNOCCUPIED
+                    if ~obj.map.isRegionOccupied(position, Settings.ROBOT_RADIUS)
                         positionValid = true;
                         
                         obj.robotGroundTruthStates{id} = RobotState([position; rand()*2*pi], diag([0;0;0]));
+                    end
+                end
+            end
+        end
+        
+        % creates a lidar measurement around the robot state.
+        function [lidarMeasurement] = generateLidarMeasurement(obj, robotState)
+            % s = theta*r => mapRes = dTheta*senseRange => dTheta =
+            % (mapRes/senseRange) * 0.8;
+            dTheta = (obj.map.mapResolution/Settings.SENSE_RANGE) * 0.8;
+            
+            lidarMeasurement = LidarMeasurement();
+            lidarMeasurement.bearings = (0:dTheta:2*pi);
+            lidarMeasurement.ranges = -ones(1, length(lidarMeasurement.bearings));
+            
+            [r, c] = obj.map.position2MapIndex(robotState.pos); % center index
+            
+            for idx = (1:length(lidarMeasurement.bearings))
+                for l = (0:0.5:(Settings.SENSE_RANGE/obj.map.mapResolution))
+                    col = round(c + cos(lidarMeasurement.bearings(idx))*l);
+                    row = round(r + sin(lidarMeasurement.bearings(idx))*l);
+                    
+                    if obj.map.occupancyGrid(row, col) == OccupancyState.OCCUPIED
+                        lidarMeasurement.ranges(idx) = l*obj.map.mapResolution;
+                        break;
                     end
                 end
             end

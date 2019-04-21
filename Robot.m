@@ -13,6 +13,9 @@ classdef Robot < handle
         
         linesOfExploration; % a map associating each robot with a line of exploration (local frame)
         
+        % last lidar measurement
+        newestLidarMeasurement;
+        
         % waypoints: [[x1;y1], [x2;y2], [x3;y3], ...]
         waypoints;
     end
@@ -36,18 +39,52 @@ classdef Robot < handle
         
         % using the current state estimate, drive the vehicle and or plan a
         % new path.
-        function [] = motionUpdate()
+        function [] = motionUpdate(obj)
             
         end
         
         % update the local occupancy grid and exploration tree using the
         % synthetic lidar measurement.
-        function [] = senseUpdate(lidarMeasurement)
+        function [] = senseUpdate(obj, lidarMeasurement)
+            % update the local occupancy grid with this measurement
+            obj.newestLidarMeasurement = lidarMeasurement;
+            
+            localBearings = lidarMeasurement.bearings + obj.localState.theta; % transform the measurements into the current frame
+            [r, c] = obj.localMap.position2MapIndex(obj.localState.pos); % the center point
+            
+            for idx = (1:length(localBearings))
+                if lidarMeasurement.ranges(idx) < 0
+                    % set all nodes unoccupied up to sense range.
+                    for l = (0:0.5:(Settings.SENSE_RANGE/obj.localMap.mapResolution))
+                        col = round(c + cos(localBearings(idx))*l);
+                        row = round(r + sin(localBearings(idx))*l);
+                        
+                        if obj.localMap.occupancyGrid(row, col) == OccupancyState.UNKOWN
+                            obj.localMap.occupancyGrid(row, col) = OccupancyState.UNOCCUPIED;
+                        end
+                        
+                    end
+                else
+                    for l = (0:0.5:(lidarMeasurement.ranges(idx)/obj.localMap.mapResolution))
+                        col = round(c + cos(localBearings(idx))*l);
+                        row = round(r + sin(localBearings(idx))*l);
+                        if obj.localMap.occupancyGrid(row, col) == OccupancyState.UNKOWN
+                            obj.localMap.occupancyGrid(row, col) = OccupancyState.UNOCCUPIED;
+                        end
+                    end
+                    
+                    col = round(c + cos(localBearings(idx))*lidarMeasurement.ranges(idx)/obj.localMap.mapResolution);
+                    row = round(r + sin(localBearings(idx))*lidarMeasurement.ranges(idx)/obj.localMap.mapResolution);
+                    
+                    obj.localMap.occupancyGrid(row, col) = OccupancyState.OCCUPIED;
+                    
+                end
+            end
             
         end
         
         % idk if this is the best way to do this...
-        function [] = communicationUpdate()
+        function [] = communicationUpdate(obj)
         end
         
         

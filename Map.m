@@ -27,7 +27,7 @@ classdef Map < handle
         function [row, col] = position2MapIndex(obj, pos)
             sz = size(obj.occupancyGrid);
             
-            ratio = ((pos + (sz(1)*obj.mapResolution)/2) / (sz(1)*obj.mapResolution))
+            ratio = ((pos + (sz(1)*obj.mapResolution)/2) / (sz(1)*obj.mapResolution));
             
             temp = round([1;1] + (sz(1)-1) * ratio);
             row = temp(2);
@@ -64,6 +64,16 @@ classdef Map < handle
         function [occ] = get(obj, pos)
             [r, c] = obj.position2MapIndex(pos);
             occ = obj.occupancyGrid(r, c);
+        end
+        
+        % tests if a region surrounding the position is occupied
+        function [occupied] = isRegionOccupied(obj, pos, pixelRad)
+            [r, c] = obj.position2MapIndex(pos);
+            try
+                occupied = any(any(obj.occupancyGrid(r-pixelRad:r+pixelRad, c-pixelRad:c+pixelRad)));
+            catch
+                occupied = true;
+            end
         end
         
         function [] = set(obj, pos, occ)
