@@ -9,6 +9,10 @@ classdef Map < handle
     methods
         
         function obj = Map(pathToMapImage, resolution)
+            if nargin == 0
+                return;
+            end
+            
             img = imread(pathToMapImage);
             % take the first channel and call it the occupancy grid.
             obj.occupancyGrid = uint8((img(:, :, 1)>0)*OccupancyState.OCCUPIED);

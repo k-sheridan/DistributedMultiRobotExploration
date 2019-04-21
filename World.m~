@@ -3,18 +3,28 @@ classdef World
     % positions.
     
     properties
-        groundTruthMap; % an occupancy grid which is the actual map, origin at center.
-        mapResolution; % meters per pixel
+        map % occupancy grid of the world (ground truth in global frame)
+        robots % a cell array of all robots.
+        robotGroundTruthStates % a cell array which serves as the absolute robot positons.
     end
     
     methods
-        function obj = World(pathToMapImage, resolution)
-            img = imread(pathToMapImage);
-            % take the first channel and call it the occupancy grid.
-            obj.groundTruthMap = (img(:, :, 1)>0)*255;
+        function obj = World(pathToMapImage, mapResolution, nRobots)
+            obj.map = Map(pathToMapImage, mapResolution);
+            
+            rng(1); % make deterministic
+            
+            % create all robots
+            obj.robots = {};
+            obj.robotGroundTruthStates = {};
+            mapSize = length(obj.map.occupancyGrid)*2;
+            for id = (1:nRobots)
+                obj.robots{id} = Robot(id, mapSize, mapResolution);
+                obj.robotGroundTruthStates{id} = Rob
+            end
         end
         
-        function 
+        
     end
 end
 
