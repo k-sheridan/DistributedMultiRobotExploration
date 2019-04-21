@@ -36,9 +36,9 @@ classdef Map < handle
         
         % converts row column to coordinate
         function [pos] = mapIndex2Position(obj, row, col)
-            sz = size(obj.occupancyGrid)
+            sz = size(obj.occupancyGrid);
             
-            ratio = (([col;row] - 1) / (sz(1)-1))
+            ratio = (([col;row] - 1) / (sz(1)-1));
             
             pos = ratio * sz(1)*obj.mapResolution - (sz(1)*obj.mapResolution/2);
             

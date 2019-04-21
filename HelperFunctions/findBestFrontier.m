@@ -1,17 +1,19 @@
-function [bestFrontierPosition, nFrontiers] = findBestFrontier(map, robotPosition, targetPosition, searchRadius)
+function [bestFrontierPosition, nFrontiers] = findBestFrontier(robot, targetPosition, searchRadius)
 % Finds and selects the best frontier position given a map,  target
 % location (m), robot position (m), and search radius (m).
+% target position should be in local frame.
 
 % weights
 kPos = 1;
 kTarget = 1;
+kLine = 1;
 
-[targetRow, targetCol] = map.position2MapIndex(targetPosition);
+[targetRow, targetCol] = robot.localMap.position2MapIndex(targetPosition);
 
 % convert the search radius into a pixel/occupancy unit
-pixelSearchRadius = round(searchRadius / map.mapResolution);
+pixelSearchRadius = round(searchRadius / robot.localMap.mapResolution);
 
-sz = size(map.occupancyGrid);
+sz = size(robot.localMap.occupancyGrid);
 
 rowUpper = min(targetRow+pixelSearchRadius, sz(1));
 rowLower = max(targetRow-pixelSearchRadius, 1);
@@ -25,10 +27,11 @@ bestFrontierScore = realmax;
 
 for row = (rowLower:rowUpper)
     for col = (colLower:colUpper)
-        if (map.occupancyGrid(row, col) == OccupancyState.UNKOWN) && any(any(map.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNOCCUPIED))
+        if (robot.localMap.occupancyGrid(row, col) == OccupancyState.UNKOWN) && any(any(robot.localMap.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNOCCUPIED))
             % evaluate the score
-            frontierPos = map.mapIndex2Position(row, col);
-            score = kPos * norm(frontierPos - robotPosition) + kTarget * norm(frontierPos - targetPosition);
+            frontierPos = robot.localMap.mapIndex2Position(row, col);
+            score = kPos * norm(frontierPos - robot.localState.pos) + kTarget * norm(frontierPos - targetPosition)...
+                + kLine * robot.linesOfExploration.computeCost(robot.localState.pos);
            
             if score < bestFrontierScore
                 bestFrontierPosition = frontierPos;

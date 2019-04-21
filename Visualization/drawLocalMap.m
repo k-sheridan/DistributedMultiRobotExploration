@@ -8,9 +8,13 @@ th = robot.startingState.theta;
 tImg = imtranslate(imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])), robot.startingState.pos);
 
 %imshow(robot.localMap.occupancyGrid, [OccupancyState.UNOCCUPIED, OccupancyState.OCCUPIED], 'XData', [-width/2, width/2], 'Ydata', [-width/2, width/2]);
-imshow(tImg, [OccupancyState.UNOCCUPIED, OccupancyState.OCCUPIED], 'XData', [-width/2, width/2], 'Ydata', [-width/2, width/2]);
+imshow(tImg, [OccupancyState.UNOCCUPIED, OccupancyState.OCCUPIED]);
 col = linspace(1, 0, 255)';
 set(gca, 'Colormap', [col, col, col]);
+
+
+% TODO after this transformation, the map resolution does not change. so draw
+% robots wrt to the center index.
 
 end
 
