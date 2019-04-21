@@ -16,7 +16,8 @@ classdef Robot < handle
         % last lidar measurement
         newestLidarMeasurement;
         
-        % waypoints: [[x1;y1], [x2;y2], [x3;y3], ...]
+        % waypoints: [[x1;y1], [x2;y2], [x3;y3], ...] meters in local
+        % frame.
         waypoints;
     end
     
@@ -35,11 +36,32 @@ classdef Robot < handle
             
             obj.linesOfExploration = LinesOfExploration();
             
+            obj.waypoints = [];
+            
         end
         
         % using the current state estimate, drive the vehicle and or plan a
         % new path.
         function [] = motionUpdate(obj)
+            
+            % create a new path to a frontier if there is no more to drive.
+            if isempty(obj.waypoints)
+                % find the best frontier to explore.
+                [frontierPos, nFrontiers] = findBestFrontier(obj, obj.localState.pos, Settings.DEFAULT_EXPLORATION_RADIUS);
+                
+                if ~nFrontiers
+                    fprintf('No Frontiers in the local area... big search\n');
+                    [frontierPos, nFrontiers] = findBestFrontier(obj, obj.localState.pos, -1);
+                    
+                    if ~nFrontiers
+                        fprintf('Exploration Finished!');
+                        return;
+                    end
+                end
+                
+                
+                % generate a path to the selected frontier.
+            end
             
         end
         
@@ -49,6 +71,11 @@ classdef Robot < handle
             % update the local occupancy grid with this measurement
             obj.newestLidarMeasurement = lidarMeasurement;
             
+            obj.mapUpdate(lidarMeasurement); % updates the local occupancy grid.
+            
+        end
+        
+        function [] = mapUpdate(obj, lidarMeasurement)
             localBearings = lidarMeasurement.bearings + obj.localState.theta; % transform the measurements into the current frame
             [r, c] = obj.localMap.position2MapIndex(obj.localState.pos); % the center point
             
@@ -80,13 +107,34 @@ classdef Robot < handle
                     
                 end
             end
-            
         end
         
         % idk if this is the best way to do this...
         function [] = communicationUpdate(obj)
         end
         
+        
+        % generate a star path. inputs and outputs are in the local frame
+        % in meters.
+        function [waypoints] = generatePath(obj, startingPos, goalPos)
+            [startRow, startCol] = obj.localMap.position2MapIndex(startingPos);
+            [goalRow, goalCol] = obj.localMap.position2MapIndex(goalPos);
+            
+            sz = size(obj.localMap.occupancyGrid);
+            goalReg = zeros(sz(1));
+            goalReg(goalRow, goalCol) = 1;
+            
+            [aStarWaypoints] = ASTARPATH(startCol, startRow, obj.localMap.occupancyGrid, goalReg, 8);
+            
+            waypoints = zeros(2, length(aStarWaypoints));
+            
+            for idx = (1:length(aStarWaypoints))
+                waypoints(1:2, idx) = obj.localMap.mapIndex2Position(aStarWaypoints(idx, 1), aStarWaypoints(idx, 2));
+            end
+            
+            % flip the waypoints
+            waypoints = [waypoints(1:2, end:-1:1)];
+        end
         
     end
 end

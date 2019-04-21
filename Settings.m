@@ -6,6 +6,7 @@ classdef Settings
         QUADTREE_LEVELS = 5;
         FORWARD_VELOCITY = 0.5;
         ROBOT_RADIUS = 1;
+        DEFAULT_EXPLORATION_RADIUS = 20;
     end
 end
 

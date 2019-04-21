@@ -3,6 +3,8 @@ function [bestFrontierPosition, nFrontiers] = findBestFrontier(robot, targetPosi
 % location (m), robot position (m), and search radius (m).
 % target position should be in local frame.
 
+% -1 search radius means search the entire map.
+
 % weights
 kPos = 1;
 kTarget = 1;
@@ -15,10 +17,17 @@ pixelSearchRadius = round(searchRadius / robot.localMap.mapResolution);
 
 sz = size(robot.localMap.occupancyGrid);
 
-rowUpper = min(targetRow+pixelSearchRadius, sz(1));
-rowLower = max(targetRow-pixelSearchRadius, 1);
-colUpper = min(targetCol+pixelSearchRadius, sz(2));
-colLower = max(targetCol-pixelSearchRadius, 1);
+rowUpper = min(targetRow+pixelSearchRadius, sz(1)-1);
+rowLower = max(targetRow-pixelSearchRadius, 2);
+colUpper = min(targetCol+pixelSearchRadius, sz(2)-1);
+colLower = max(targetCol-pixelSearchRadius, 2);
+
+if searchRadius < 0
+    rowUpper = sz(1)-1;
+    rowLower = 2;
+    colUpper = sz(2)-1;
+    colLower = 2;
+end
 
 % look over all the possible indices for a frontier
 nFrontiers = 0;
