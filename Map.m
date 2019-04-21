@@ -27,7 +27,7 @@ classdef Map < handle
         function [row, col] = position2MapIndex(obj, pos)
             sz = size(obj.occupancyGrid);
             
-            ratio = (pos + (sz(1)*obj.mapResolution)/2) / (sz(1)*obj.mapResolution)/2;
+            ratio = ((pos + (sz(1)*obj.mapResolution)/2) / (sz(1)*obj.mapResolution)/2)
             
             temp = round([1;1] + (sz(1)-1) * ratio);
             row = temp(1);
@@ -36,9 +36,9 @@ classdef Map < handle
         
         % converts row column to coordinate
         function [pos] = mapIndex2Position(obj, row, col)
-            sz = size(obj.occupancyGrid);
+            sz = size(obj.occupancyGrid)
             
-            ratio = (([row;col] - 1) / (sz(1)-1));
+            ratio = (([col;row] - 1) / (sz(1)-1))
             
             pos = ratio * sz(1)*obj.mapResolution - (sz(1)*obj.mapResolution/2);
             
