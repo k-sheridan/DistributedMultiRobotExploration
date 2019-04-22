@@ -1,7 +1,7 @@
 % This script will run and visualize a simulated distributed multi-robot
 % exploration in a gps-denied environment.
 
-w = World('Map1.png', 0.5, 9);
+w = World('Map1.png', 0.5, 1);
 
 f1 = figure;
 f2 = figure;
