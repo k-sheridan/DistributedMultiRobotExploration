@@ -45,7 +45,8 @@ classdef Robot < handle
         function [dx] = motionUpdate(obj, dt)
             
             % create a new path to a frontier if there is no more to drive.
-            if isempty(obj.waypoints)
+            [~,nwp] = size(obj.waypoints);
+            if ~nwp || (nwp==1 && (norm(obj.waypoints(1:2,1) - obj.localState.pos) < Settings.WAYPOINT_DISTANCE_THRESHOLD))
                 % find the best frontier to explore.
                 [frontierPos, nFrontiers] = findBestFrontier(obj, obj.localState.pos, Settings.DEFAULT_EXPLORATION_RADIUS);
                 
@@ -69,7 +70,7 @@ classdef Robot < handle
             % already gone, and move towards next goal...
             stopFlag = false;
             while ~stopFlag
-                if norm(obj.waypoints(1) - obj.localState.pos) < Settings.WAYPOINT_DISTANCE_THRESHOLD
+                if norm(obj.waypoints(1:2,1) - obj.localState.pos) < Settings.WAYPOINT_DISTANCE_THRESHOLD
                     obj.waypoints = obj.waypoints(1:2, 2:end); % cut the first waypoint
                 else
                     stopFlag = true;
@@ -90,6 +91,10 @@ classdef Robot < handle
             end
             
             dTheta = newTheta - obj.localState.theta;
+            
+            if norm(dPos) < 1e-3
+                disp('nah');
+            end
             
             dx = [dPos; dTheta];
         end
