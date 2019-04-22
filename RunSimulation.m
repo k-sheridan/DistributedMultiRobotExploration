@@ -7,7 +7,7 @@ f1 = figure;
 f2 = figure;
 
 dt = 1;
-for t = (1:600)
+for t = (1:6000)
     w.run(dt);
     
     

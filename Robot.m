@@ -48,14 +48,15 @@ classdef Robot < handle
             [~,nwp] = size(obj.waypoints);
             if ~nwp || (nwp==1 && (norm(obj.waypoints(1:2,1) - obj.localState.pos) < Settings.WAYPOINT_DISTANCE_THRESHOLD))
                 % find the best frontier to explore.
-                [frontierPos, nFrontiers] = findBestFrontier(obj, obj.localState.pos, Settings.DEFAULT_EXPLORATION_RADIUS);
+                [frontierPos, nFrontiers] = findBestFrontier(obj, [0;0], Settings.DEFAULT_EXPLORATION_RADIUS);
                 
                 if ~nFrontiers
                     fprintf('No Frontiers in the local area... big search\n');
                     [frontierPos, nFrontiers] = findBestFrontier(obj, obj.localState.pos, -1);
                     
                     if ~nFrontiers
-                        fprintf('Exploration Finished!');
+                        fprintf('Exploration Finished!\n');
+                        dx = zeros(3, 1);
                         return;
                     end
                 end
@@ -63,18 +64,26 @@ classdef Robot < handle
                 
                 % generate a path to the selected frontier.
                 obj.waypoints = obj.generatePath(obj.localState.pos, frontierPos);
+                obj.waypoints
+                frontierPos
             end
+            
             
             
             % now that there is a path to follow, check how far we have
             % already gone, and move towards next goal...
             stopFlag = false;
-            while ~stopFlag
+            while ~stopFlag && ~isempty(obj.waypoints)
                 if norm(obj.waypoints(1:2,1) - obj.localState.pos) < Settings.WAYPOINT_DISTANCE_THRESHOLD
                     obj.waypoints = obj.waypoints(1:2, 2:end); % cut the first waypoint
                 else
                     stopFlag = true;
                 end
+            end
+            
+            
+            if isempty(obj.waypoints)
+                return;
             end
             
             % move towards the goal
@@ -151,23 +160,28 @@ classdef Robot < handle
         % generate a star path. inputs and outputs are in the local frame
         % in meters.
         function [waypoints] = generatePath(obj, startingPos, goalPos)
-            [startRow, startCol] = obj.localMap.position2MapIndex(startingPos);
-            [goalRow, goalCol] = obj.localMap.position2MapIndex(goalPos);
+            og = robotics.OccupancyGrid(double(obj.localMap.occupancyGrid) / double(OccupancyState.OCCUPIED), 1/obj.localMap.mapResolution);
             
+            
+            R = [1,0; 0,-1];
             sz = size(obj.localMap.occupancyGrid);
-            goalReg = zeros(sz(1));
-            goalReg(goalRow, goalCol) = 1;
+            t = sz(1)*obj.localMap.mapResolution/2;
             
-            [aStarWaypoints] = ASTARPATH(startCol, startRow, obj.localMap.occupancyGrid, goalReg, 8);
+            start = R*startingPos + t;
+            goal = R*goalPos + t;
             
-            waypoints = zeros(2, length(aStarWaypoints));
+            % add buffer
+            %inflate(og, obj.localMap.mapResolution);
             
-            for idx = (1:length(aStarWaypoints))
-                waypoints(1:2, idx) = obj.localMap.mapIndex2Position(aStarWaypoints(idx, 1), aStarWaypoints(idx, 2));
-            end
+            setOccupancy(og, start', 0)
+            setOccupancy(og, goal', 0)
             
-            % flip the waypoints
-            waypoints = [waypoints(1:2, end:-1:1)];
+            prm = robotics.PRM;
+            prm.Map = og;
+            
+            path = findpath(prm, start', goal');
+            waypoints = R*(path' - t);
+
         end
         
         function [globalState] = getGlobalStateEstimate(obj)
