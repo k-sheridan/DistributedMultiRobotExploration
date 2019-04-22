@@ -165,6 +165,19 @@ classdef Robot < handle
             waypoints = [waypoints(1:2, end:-1:1)];
         end
         
+        function [globalState] = getGlobalStateEstimate(obj)
+            R = [cos(obj.startingState.theta), -sin(obj.startingState.theta); sin(obj.startingState.theta), cos(obj.startingState.theta)];
+            
+            newTheta = obj.startingState.theta + obj.localState.theta;
+            
+            newPos = R*obj.localState.pos + obj.startingState.pos;
+            
+            % transform and add the uncertainty.
+            T = [R,zeros(2,1); zeros(1,2),1];
+            
+            globalState = RobotState([newPos; newTheta], obj.startingState.Sigma + T*obj.localState.Sigma*T');
+        end
+        
     end
 end
 

@@ -46,13 +46,13 @@ classdef World
             
             % sense
             for idx = (1:length(obj.robots))
-                lm = obj.generateLidarMeasurement(obj.robotGroundTruthStates{idx})
+                lm = obj.generateLidarMeasurement(obj.robotGroundTruthStates{idx});
                 obj.robots{idx}.senseUpdate(lm);
             end
             
             % motion
             for idx = (1:length(obj.robots))
-                [dx] = obj.robots{idx}.motionUpdate(dt);
+                [dx] = obj.robots{idx}.motionUpdate(dt)
                 
                 % ground truth update:
                 obj.robotGroundTruthStates{idx}.update(dx);
@@ -87,12 +87,15 @@ classdef World
                             break;
                         end
                     catch
-                        fprintf('Wall found.\n')
+                        %fprintf('Wall found.\n');
                         lidarMeasurement.ranges(idx) = l*obj.map.mapResolution;
                         break;
                     end
                 end
             end
+            
+            lidarMeasurement.bearings = lidarMeasurement.bearings - robotState.theta;
+            
         end
         
         

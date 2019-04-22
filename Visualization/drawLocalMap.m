@@ -16,5 +16,17 @@ set(gca, 'Colormap', [col, col, col]);
 % TODO after this transformation, the map resolution does not change. so draw
 % robots wrt to the center index.
 
+centerIndex = (size(tImg)-1)'/2 + 1;
+
+globalState = robot.getGlobalStateEstimate();
+
+robotRow = centerIndex(1) + globalState.pos(2)/robot.localMap.mapResolution
+robotCol = centerIndex(2) + globalState.pos(1)/robot.localMap.mapResolution
+
+hold on
+
+plot(robotCol, robotRow, 'o');
+
+
 end
 

@@ -78,9 +78,20 @@ classdef Robot < handle
             
             % move towards the goal
             delta = obj.waypoints(1:2, 1) - obj.localState.pos;
+            dist = norm(delta);
+            newTheta = atan2(delta(2), delta(1));
             
-            length
+            newDist = min(Settings.FORWARD_VELOCITY*dt, dist);
             
+            if dist < 1e-16
+                dPos = [0;0];
+            else
+                dPos = delta/dist * newDist;
+            end
+            
+            dTheta = newTheta - obj.localState.theta;
+            
+            dx = [dPos; dTheta];
         end
         
         % update the local occupancy grid and exploration tree using the
@@ -152,6 +163,12 @@ classdef Robot < handle
             
             % flip the waypoints
             waypoints = [waypoints(1:2, end:-1:1)];
+        end
+        
+        function [globalState] = getGlobalStateEstimate(obj)
+            R = [cos(obj.startingState.theta), -sin(obj.startingState.theta); sin(obj.startingState.theta), cos(obj.startingState.theta)];
+            
+            newTheta = obj.startingState.theta + obj.
         end
         
     end

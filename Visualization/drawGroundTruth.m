@@ -20,6 +20,7 @@ for idx = (1:length(world.robots))
     if ~isempty(world.robots{idx}.newestLidarMeasurement)
         
         nb = (world.robots{idx}.newestLidarMeasurement.bearings + world.robotGroundTruthStates{idx}.theta);
+        %nb = world.robots{idx}.newestLidarMeasurement.bearings;
         
         tempRanges = world.robots{idx}.newestLidarMeasurement.ranges;
         for innerIdx = (1:length(world.robots{idx}.newestLidarMeasurement.ranges))
