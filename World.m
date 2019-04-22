@@ -6,6 +6,7 @@ classdef World
         map % occupancy grid of the world (ground truth in global frame)
         robots % a cell array of all robots.
         robotGroundTruthStates % a cell array which serves as the absolute robot positons.
+        t; % timer, seconds
     end
     
     methods
@@ -13,6 +14,8 @@ classdef World
             obj.map = Map(pathToMapImage, mapResolution);
             
             rng(1); % make deterministic
+            
+            obj.t = 0;
             
             % create all robots
             obj.robots = {};
@@ -36,6 +39,31 @@ classdef World
             end
         end
         
+        
+        % main simulation running function. handles communication, sensing,
+        % control, and simulation.
+        function [] = run(obj, dt)
+            
+            % sense
+            for idx = (1:length(obj.robots))
+                lm = obj.generateLidarMeasurement(obj.robotGroundTruthStates{idx})
+                obj.robots{idx}.senseUpdate(lm);
+            end
+            
+            % motion
+            for idx = (1:length(obj.robots))
+                [dx] = obj.robots{idx}.motionUpdate(dt);
+                
+                % ground truth update:
+                obj.robotGroundTruthStates{idx}.update(dx);
+                % odom update:
+                obj.robots{idx}.localState.update(dx);
+                
+            end
+            
+        end
+        
+        
         % creates a lidar measurement around the robot state.
         function [lidarMeasurement] = generateLidarMeasurement(obj, robotState)
             % s = theta*r => mapRes = dTheta*senseRange => dTheta =
@@ -53,7 +81,13 @@ classdef World
                     col = round(c + cos(lidarMeasurement.bearings(idx))*l);
                     row = round(r + sin(lidarMeasurement.bearings(idx))*l);
                     
-                    if obj.map.occupancyGrid(row, col) == OccupancyState.OCCUPIED
+                    try
+                        if obj.map.occupancyGrid(row, col) == OccupancyState.OCCUPIED
+                            lidarMeasurement.ranges(idx) = l*obj.map.mapResolution;
+                            break;
+                        end
+                    catch
+                        fprintf('Wall found.\n')
                         lidarMeasurement.ranges(idx) = l*obj.map.mapResolution;
                         break;
                     end
