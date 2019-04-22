@@ -5,7 +5,7 @@ width = length(robot.localMap.occupancyGrid)*robot.localMap.mapResolution;
 % transform local map into estimated global frame.
 th = robot.startingState.theta;
 
-tImg = imtranslate(imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])), robot.startingState.pos);
+tImg = imtranslate(imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])), robot.startingState.pos/robot.localMap.mapResolution);
 
 sz = size(tImg);
 assert(sz(1)==sz(2));
@@ -23,6 +23,12 @@ hold on
 
 plot(globalState.pos(1), globalState.pos(2), 'o');
 
+% transform and draw the path being followed.
+path = [robot.localState.pos, robot.waypoints];
+
+pathT = robot.startingState.rotation() * path + robot.startingState.pos;
+
+plot(pathT(1, :), pathT(2, :), 'b-');
 
 end
 

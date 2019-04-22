@@ -52,7 +52,7 @@ classdef World
             
             % motion
             for idx = (1:length(obj.robots))
-                [dx] = obj.robots{idx}.motionUpdate(dt)
+                [dx] = obj.robots{idx}.motionUpdate(dt);
                 
                 % ground truth update:
                 obj.robotGroundTruthStates{idx}.update(dx);
