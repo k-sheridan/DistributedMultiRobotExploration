@@ -68,6 +68,7 @@ classdef Robot < handle
             
             
             
+            
             % now that there is a path to follow, check how far we have
             % already gone, and move towards next goal...
             stopFlag = false;
@@ -81,6 +82,14 @@ classdef Robot < handle
             
             
             if isempty(obj.waypoints)
+                dx = zeros(3, 1);
+                return;
+            end
+            
+            
+            [r, c] = obj.localMap.position2MapIndex(obj.waypoints(1:2, end));
+            if obj.localMap.occupancyGrid(r, c) == OccupancyState.OCCUPIED
+                obj.waypoints = [];
                 dx = zeros(3, 1);
                 return;
             end
