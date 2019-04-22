@@ -30,5 +30,7 @@ pathT = robot.startingState.rotation() * path + robot.startingState.pos;
 
 plot(pathT(1, :), pathT(2, :), 'b-');
 
+daspect('auto');
+
 end
 

@@ -42,10 +42,14 @@ for row = (rowLower:rowUpper)
             score = kPos * norm(frontierPos - robot.localState.pos) + kTarget * norm(frontierPos - targetPosition)...
                 + kLine * robot.linesOfExploration.computeCost(robot.localState.pos);
            
+            
             if score < bestFrontierScore
                 bestFrontierPosition = frontierPos;
-                nFrontiers = nFrontiers + 1;
+                bestFrontierScore = score;
+                
             end
+            
+            nFrontiers = nFrontiers + 1;
             
         end
     end

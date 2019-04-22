@@ -64,8 +64,6 @@ classdef Robot < handle
                 
                 % generate a path to the selected frontier.
                 obj.waypoints = obj.generatePath(obj.localState.pos, frontierPos);
-                obj.waypoints
-                frontierPos
             end
             
             
@@ -83,6 +81,7 @@ classdef Robot < handle
             
             
             if isempty(obj.waypoints)
+                dx = zeros(3, 1);
                 return;
             end
             
@@ -178,9 +177,16 @@ classdef Robot < handle
             
             prm = robotics.PRM;
             prm.Map = og;
+            prm.NumNodes = Settings.PRM_NODES;
             
             path = findpath(prm, start', goal');
+            
+            if isempty(path)
+                path = [start, goal]';
+            end
+            
             waypoints = R*(path' - t);
+            
 
         end
         

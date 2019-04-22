@@ -1,7 +1,0 @@
-function [quadrant] = vec2Quadrant(vec)
-% converts 2d vec to a quadrant number
-
-if ()
-
-end
-

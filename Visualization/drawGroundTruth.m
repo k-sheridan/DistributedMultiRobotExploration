@@ -44,6 +44,7 @@ for idx = (1:length(world.robots))
     end
 end
 
+daspect('auto');
 
 end
 

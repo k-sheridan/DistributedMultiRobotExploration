@@ -6,6 +6,7 @@ classdef World
         map % occupancy grid of the world (ground truth in global frame)
         robots % a cell array of all robots.
         robotGroundTruthStates % a cell array which serves as the absolute robot positons.
+        startingStatesGroundTruth % cell array of initial states.
         t; % timer, seconds
     end
     
@@ -34,6 +35,9 @@ classdef World
                         positionValid = true;
                         
                         obj.robotGroundTruthStates{id} = RobotState([position; rand()*2*pi], diag([0;0;0]));
+                        %obj.robotGroundTruthStates{id}.theta = 0;
+                        
+                        obj.startingStatesGroundTruth{id} = RobotState([obj.robotGroundTruthStates{id}.pos; obj.robotGroundTruthStates{id}.theta], diag([0;0;0]));
                     end
                 end
             end
@@ -55,11 +59,16 @@ classdef World
                 [dx] = obj.robots{idx}.motionUpdate(dt);
                 
                 % ground truth update:
-                obj.robotGroundTruthStates{idx}.update(dx);
+                % must transform the delta from local to global.
+                globaldx = [obj.startingStatesGroundTruth{idx}.rotation * dx(1:2, 1); dx(3, 1)];
+                %globaldx = dx;
+                obj.robotGroundTruthStates{idx}.update(globaldx);
                 % odom update:
                 obj.robots{idx}.localState.update(dx);
                 
             end
+            
+            obj.t = obj.t + dt;
             
         end
         
