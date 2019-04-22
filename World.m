@@ -68,7 +68,7 @@ classdef World
         function [lidarMeasurement] = generateLidarMeasurement(obj, robotState)
             % s = theta*r => mapRes = dTheta*senseRange => dTheta =
             % (mapRes/senseRange) * 0.8;
-            dTheta = (obj.map.mapResolution/Settings.SENSE_RANGE) * 0.8;
+            dTheta = (obj.map.mapResolution/Settings.SENSE_RANGE) * 0.5;
             
             lidarMeasurement = LidarMeasurement();
             lidarMeasurement.bearings = (0:dTheta:2*pi);
