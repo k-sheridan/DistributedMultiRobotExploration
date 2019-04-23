@@ -5,7 +5,8 @@ width = length(robot.localMap.occupancyGrid)*robot.localMap.mapResolution;
 % transform local map into estimated global frame.
 th = robot.startingState.theta;
 
-tImg = imtranslate(imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])), robot.startingState.pos/robot.localMap.mapResolution);
+%tImg = imtranslate(imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])), robot.startingState.pos/robot.localMap.mapResolution);
+tImg = (imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])));
 
 sz = size(tImg);
 assert(sz(1)==sz(2));
@@ -17,7 +18,13 @@ imshow(tImg, [OccupancyState.UNOCCUPIED, OccupancyState.OCCUPIED] , 'XData', [-n
 col = linspace(1, 0, 255)';
 set(gca, 'Colormap', [col, col, col]);
 
+scale = 10;
+line(-[robot.startingState.pos(1), robot.startingState.pos(1)+scale], [robot.startingState.pos(2), robot.startingState.pos(2)], 'Color', [1, 0, 0]);
+line(-[robot.startingState.pos(1), robot.startingState.pos(1)], [robot.startingState.pos(2), robot.startingState.pos(2)+scale], 'Color', [0, 1, 0]);
+
 globalState = robot.getGlobalStateEstimate();
+
+globalState.pos = [0;0];
 
 hold on
 
@@ -26,7 +33,8 @@ plot(globalState.pos(1), globalState.pos(2), 'o');
 % transform and draw the path being followed.
 path = [robot.localState.pos, robot.waypoints];
 
-pathT = robot.startingState.rotation() * path + robot.startingState.pos;
+%pathT = robot.startingState.rotation() * path + robot.startingState.pos;
+pathT = robot.startingState.rotation() * path;
 
 plot(pathT(1, :), pathT(2, :), 'b-');
 

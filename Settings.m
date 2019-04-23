@@ -1,7 +1,7 @@
 classdef Settings
     properties (Constant)
         SENSE_RANGE = 15;
-        COMM_RANGE = 15;
+        COMM_RANGE = 40;
         COMM_RATE = 100;
         QUADTREE_LEVELS = 5;
         FORWARD_VELOCITY = 0.5;

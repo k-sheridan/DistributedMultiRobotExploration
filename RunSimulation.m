@@ -3,6 +3,8 @@
 clear all
 w = World('Map1.png', 0.5, 4);
 
+w.robots{1}.startingState.update([0;10;pi/8])
+
 f1 = figure;
 
 dt = 1;

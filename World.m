@@ -91,10 +91,42 @@ classdef World
                         T_rec_send = inv(T_w_rec) * T_w_send;
                         
                         obj.robots{recIdx}.communicationUpdate(obj.robots{sendIdx}, T_rec_send);
+                        
+                        
+                        % run the consensus update if the ids are in
+                        % ascending order. This ensures the update only
+                        % runs once.
+                        if recIdx < sendIdx
+                            obj.consensusUpdate(recIdx, sendIdx);
+                        else
+                            obj.consensusUpdate(recIdx, sendIdx);
+                        end
+                        
                     end
                     
                 end
             end
+        end
+        
+        
+        % runs the consensus update.
+        function [] = consensusUpdate(obj, id1, id2)
+            % T_global_global = r1_global_local * r1_local_r1 * T_r1_r2 * inv(r2_global_local * r2_local_r2)
+            T_r1_r2 = inv(obj.robotGroundTruthStates{id1}.transformation()) * obj.robotGroundTruthStates{id2}.transformation();
+            
+            r1_global_local = obj.robots{id1}.startingState.transformation();
+            r2_global_local = obj.robots{id2}.startingState.transformation();
+            
+            r1_local_r1 = obj.robots{id1}.localState.transformation();
+            r2_local_r2 = obj.robots{id2}.localState.transformation();
+            
+            T_globalR1_globalR2 = r1_global_local * r1_local_r1 * T_r1_r2 * inv(r2_global_local * r2_local_r2)
+            
+            theta = atan2(T_globalR1_globalR2(2, 1), T_globalR1_globalR2(1, 1));
+            pos = T_globalR1_globalR2(1:2, 3);
+            
+            obj.robots{id2}.startingState.update([pos;theta]/2);
+            
         end
         
         
