@@ -6,7 +6,7 @@ function [bestFrontierPosition, nFrontiers] = findBestFrontier(robot, targetPosi
 % -1 search radius means search the entire map.
 
 % weights
-kPos = 1;
+kPos = 0;
 kTarget = 0;
 kLine = 1;
 

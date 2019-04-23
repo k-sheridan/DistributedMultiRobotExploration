@@ -136,9 +136,12 @@ classdef Robot < handle
                     for l = (0:0.5:(Settings.SENSE_RANGE/obj.localMap.mapResolution))
                         col = round(c + cos(localBearings(idx))*l);
                         row = round(r + sin(localBearings(idx))*l);
-                        
-                        if obj.localMap.occupancyGrid(row, col) == OccupancyState.UNKOWN
-                            obj.localMap.occupancyGrid(row, col) = OccupancyState.UNOCCUPIED;
+                        try
+                            if obj.localMap.occupancyGrid(row, col) == OccupancyState.UNKOWN
+                                obj.localMap.occupancyGrid(row, col) = OccupancyState.UNOCCUPIED;
+                            end
+                        catch
+                            continue;
                         end
                         
                     end
@@ -146,15 +149,23 @@ classdef Robot < handle
                     for l = (0:0.5:(lidarMeasurement.ranges(idx)/obj.localMap.mapResolution))
                         col = round(c + cos(localBearings(idx))*l);
                         row = round(r + sin(localBearings(idx))*l);
-                        if obj.localMap.occupancyGrid(row, col) == OccupancyState.UNKOWN
-                            obj.localMap.occupancyGrid(row, col) = OccupancyState.UNOCCUPIED;
+                        try
+                            if obj.localMap.occupancyGrid(row, col) == OccupancyState.UNKOWN
+                                obj.localMap.occupancyGrid(row, col) = OccupancyState.UNOCCUPIED;
+                            end
+                        catch
+                            continue
                         end
                     end
                     
                     col = round(c + cos(localBearings(idx))*lidarMeasurement.ranges(idx)/obj.localMap.mapResolution);
                     row = round(r + sin(localBearings(idx))*lidarMeasurement.ranges(idx)/obj.localMap.mapResolution);
                     
-                    obj.localMap.occupancyGrid(row, col) = OccupancyState.OCCUPIED;
+                    try
+                        obj.localMap.occupancyGrid(row, col) = OccupancyState.OCCUPIED;
+                    catch
+                        continue
+                    end
                     
                 end
             end
@@ -164,7 +175,24 @@ classdef Robot < handle
         % The world passes in a measurement of the transformation from this
         % robot to the other.
         function [] = communicationUpdate(obj, otherRobot, T_me_them)
-            fprintf('communicated.\n');
+            %fprintf('communicated.\n');
+            
+            % compute a line in the local frame.
+            T_local_me = obj.localState.transformation();
+            if norm(T_local_me(1:2, 3)) > 1e-9
+                center = T_me_them(1:2, 3)/2;
+                
+                pt = T_local_me(1:2, 1:2)*center + T_local_me(1:2, 3);
+                
+                normal = -(T_local_me(1:2, 1:2)*center); % vec pointing toward me.
+                normal = normal/norm(normal);
+                
+                if ~obj.linesOfExploration.hasLine(otherRobot.id)
+                    obj.linesOfExploration.addLine(pt, normal, otherRobot.id);
+                    fprintf('added line\n')
+                end
+            end
+            
         end
         
         
@@ -199,7 +227,7 @@ classdef Robot < handle
             
             waypoints = R*(path' - t);
             
-
+            
         end
         
         function [globalState] = getGlobalStateEstimate(obj)

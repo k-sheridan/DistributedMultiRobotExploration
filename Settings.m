@@ -6,7 +6,7 @@ classdef Settings
         QUADTREE_LEVELS = 5;
         FORWARD_VELOCITY = 0.5;
         ROBOT_RADIUS = 1;
-        DEFAULT_EXPLORATION_RADIUS = 40;
+        DEFAULT_EXPLORATION_RADIUS = -1;
         WAYPOINT_DISTANCE_THRESHOLD = 0.2;
         PRM_NODES=100;
     end
