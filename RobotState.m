@@ -29,6 +29,10 @@ classdef RobotState < handle
             R = [cos(obj.theta), -sin(obj.theta); sin(obj.theta), cos(obj.theta)];
         end
         
+        function [T] = transformation(obj)
+            T = [obj.rotation(), obj.pos; zeros(1, 2), 1];
+        end
+        
     end
 end
 

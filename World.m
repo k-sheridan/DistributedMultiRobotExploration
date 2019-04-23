@@ -48,6 +48,9 @@ classdef World
         % control, and simulation.
         function [] = run(obj, dt)
             
+            % communicate
+            obj.communicate();
+            
             % sense
             for idx = (1:length(obj.robots))
                 lm = obj.generateLidarMeasurement(obj.robotGroundTruthStates{idx});
@@ -70,6 +73,28 @@ classdef World
             
             obj.t = obj.t + dt;
             
+        end
+        
+        % acts as a fake peer to peer communication
+        function [] = communicate(obj)
+            for recIdx = (1:length(obj.robots))
+                for sendIdx = (1:length(obj.robotGroundTruthStates))
+                    % check if the two robots can communicate reliably.
+                    d = norm(obj.robotGroundTruthStates{recIdx}.pos - obj.robotGroundTruthStates{sendIdx}.pos);
+                    
+                    % within range.
+                    if d < Settings.COMM_RANGE && sendIdx ~= recIdx
+                        T_w_rec = obj.robotGroundTruthStates{recIdx}.transformation();
+                        T_w_send = obj.robotGroundTruthStates{sendIdx}.transformation();
+                        
+                        % T_rec_send = T_rec_w * T_w_send
+                        T_rec_send = inv(T_w_rec) * T_w_send;
+                        
+                        obj.robots{recIdx}.communicationUpdate(obj.robots{sendIdx}, T_rec_send);
+                    end
+                    
+                end
+            end
         end
         
         

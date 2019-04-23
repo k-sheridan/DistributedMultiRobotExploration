@@ -161,7 +161,10 @@ classdef Robot < handle
         end
         
         % idk if this is the best way to do this...
-        function [] = communicationUpdate(obj)
+        % The world passes in a measurement of the transformation from this
+        % robot to the other.
+        function [] = communicationUpdate(obj, otherRobot, T_me_them)
+            fprintf('communicated.\n');
         end
         
         

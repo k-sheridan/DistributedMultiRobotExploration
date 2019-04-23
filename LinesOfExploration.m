@@ -1,4 +1,4 @@
-classdef LinesOfExploration
+classdef LinesOfExploration < handle
     % A class which describes the area a given robot should explore
     % line: struct: Point, Normal
     properties
@@ -12,6 +12,10 @@ classdef LinesOfExploration
         
         function [key] = id2key(obj, id)
             key = string(id);
+        end
+        
+        function [bool] = hasLine(obj, id)
+            bool = obj.lineMap.isKey(obj.id2key(id));
         end
         
         function [] = addLine(obj, pt, normal, id)
