@@ -51,12 +51,6 @@ classdef World
             % communicate
             obj.communicate();
             
-            % sense
-            for idx = (1:length(obj.robots))
-                lm = obj.generateLidarMeasurement(obj.robotGroundTruthStates{idx});
-                obj.robots{idx}.senseUpdate(lm);
-            end
-            
             % motion
             for idx = (1:length(obj.robots))
                 [dx] = obj.robots{idx}.motionUpdate(dt);
@@ -70,6 +64,13 @@ classdef World
                 obj.robots{idx}.localState.update(dx);
                 
             end
+            
+            % sense
+            for idx = (1:length(obj.robots))
+                lm = obj.generateLidarMeasurement(obj.robotGroundTruthStates{idx});
+                obj.robots{idx}.senseUpdate(lm);
+            end
+            
             
             obj.t = obj.t + dt;
             
@@ -120,7 +121,7 @@ classdef World
             r1_local_r1 = obj.robots{id1}.localState.transformation();
             r2_local_r2 = obj.robots{id2}.localState.transformation();
             
-            T_globalR1_globalR2 = r1_global_local * r1_local_r1 * T_r1_r2 * inv(r2_global_local * r2_local_r2)
+            T_globalR1_globalR2 = r1_global_local * r1_local_r1 * T_r1_r2 * inv(r2_global_local * r2_local_r2);
             
             theta = atan2(T_globalR1_globalR2(2, 1), T_globalR1_globalR2(1, 1));
             pos = T_globalR1_globalR2(1:2, 3);

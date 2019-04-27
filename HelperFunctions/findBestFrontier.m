@@ -6,7 +6,7 @@ function [bestFrontierPosition, nFrontiers] = findBestFrontier(robot, targetPosi
 % -1 search radius means search the entire map.
 
 % weights
-kPos = 0;
+kPos = 1e-4;
 kTarget = 0;
 kLine = 1;
 
@@ -36,11 +36,11 @@ bestFrontierScore = realmax;
 
 for row = (rowLower:rowUpper)
     for col = (colLower:colUpper)
-        if (robot.localMap.occupancyGrid(row, col) == OccupancyState.UNOCCUPIED) && any(any(robot.localMap.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNKOWN)) && ~any(any(robot.localMap.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.OCCUPIED))
+        if (robot.localMap.occupancyGrid(row, col) == OccupancyState.UNOCCUPIED) && any(any(robot.localMap.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNKOWN))
             % evaluate the score
             frontierPos = robot.localMap.mapIndex2Position(row, col);
             score = kPos * norm(frontierPos - robot.localState.pos) + kTarget * norm(frontierPos - targetPosition)...
-                + kLine * robot.linesOfExploration.computeCost(robot.localState.pos);
+                + kLine * (robot.linesOfExploration.computeCost(robot.localState.pos));
            
             
             if score < bestFrontierScore

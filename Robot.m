@@ -195,10 +195,16 @@ classdef Robot < handle
             
         end
         
-        
         % generate a star path. inputs and outputs are in the local frame
         % in meters.
         function [waypoints] = generatePath(obj, startingPos, goalPos)
+            waypoints = obj.generatePathPRM(startingPos, goalPos);
+        end
+        
+        
+        % generate a star path. inputs and outputs are in the local frame
+        % in meters.
+        function [waypoints] = generatePathPRM(obj, startingPos, goalPos)
             og = robotics.OccupancyGrid(double(obj.localMap.occupancyGrid) / double(OccupancyState.OCCUPIED), 1/obj.localMap.mapResolution);
             
             
@@ -218,11 +224,20 @@ classdef Robot < handle
             prm = robotics.PRM;
             prm.Map = og;
             prm.NumNodes = Settings.PRM_NODES;
+            prm.ConnectionDistance = Settings.PRM_MAXDIST;
+            
             
             path = findpath(prm, start', goal');
             
             if isempty(path)
-                path = [start, goal]';
+                % try once more to generate the path.
+                prm.NumNodes = Settings.PRM_NODES*10;
+                path = findpath(prm, start', goal');
+                
+                if isempty(path)
+                    fprintf('Failed to find valid path.')
+                    path = [start, goal]';
+                end
             end
             
             waypoints = R*(path' - t);

@@ -9,7 +9,7 @@ th = robot.startingState.theta;
 tImg = (imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])));
 
 sz = size(tImg);
-assert(sz(1)==sz(2));
+%assert(sz(1)==sz(2));
 
 newWidth = sz(1)*robot.localMap.mapResolution;
 
@@ -24,11 +24,9 @@ line(-[robot.startingState.pos(1), robot.startingState.pos(1)], [robot.startingS
 
 globalState = robot.getGlobalStateEstimate();
 
-globalState.pos = [0;0];
-
 hold on
 
-plot(globalState.pos(1), globalState.pos(2), 'o');
+plot(globalState.pos(1) - robot.startingState.pos(1), globalState.pos(2) - robot.startingState.pos(2), 'o');
 
 % transform and draw the path being followed.
 path = [robot.localState.pos, robot.waypoints];

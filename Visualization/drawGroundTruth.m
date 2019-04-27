@@ -31,18 +31,35 @@ for idx = (1:length(world.robots))
         
         points = [cos(nb); sin(nb)].*tempRanges + world.robotGroundTruthStates{idx}.pos;
         
-%         pixels = zeros(2, length(nb));
-%         
-%         for idx = (1:length(nb))
-%             [r,c] = world.map.position2MapIndex(points(1:2, idx));
-%             pixels(1:2, idx) = [c;r];
-%         end
+        %         pixels = zeros(2, length(nb));
+        %
+        %         for idx = (1:length(nb))
+        %             [r,c] = world.map.position2MapIndex(points(1:2, idx));
+        %             pixels(1:2, idx) = [c;r];
+        %         end
         
         %plot(pixels(1, :), pixels(2, :), 'r-')
         plot(points(1, :), points(2, :), 'b-')
         
     end
+    
+    % draw global frame positions
+    T_gest = world.robotGroundTruthStates{idx}.transformation * inv(world.robots{idx}.localState.transformation) * inv(world.robots{idx}.startingState.transformation)
+    
+    gpos = T_gest(1:2, 3);
+    R = T_gest(1:2, 1:2);
+    
+    scale = 10;
+    normX = R*[1;0]*scale;
+    normY = R*[0;1]*scale;
+    
+    
+    line([gpos(1), gpos(1)+normX(1)], [gpos(2), gpos(2)+normX(2)], 'Color', [1, 0, 0], 'LineWidth', 2);
+    line([gpos(1), gpos(1)+normY(1)], [gpos(2), gpos(2)++normY(2)], 'Color', [0, 1, 0], 'LineWidth', 2);
+    
+    
 end
+
 
 daspect('auto');
 
