@@ -41,7 +41,7 @@ classdef World
                         positionValid = true;
                         
                         obj.robotGroundTruthStates{id} = RobotState([position; rand()*2*pi], diag([0;0;0]));
-                        %obj.robotGroundTruthStates{id}.theta = 0;
+                        obj.robotGroundTruthStates{id}.theta = 0;
                         
                         obj.startingStatesGroundTruth{id} = RobotState([obj.robotGroundTruthStates{id}.pos; obj.robotGroundTruthStates{id}.theta], diag([0;0;0]));
                     end
@@ -55,7 +55,7 @@ classdef World
         function [] = run(obj, dt)
             
             % communicate
-            obj.communicate();
+            %obj.communicate();
             
             % motion
             for idx = (1:length(obj.robots))
