@@ -14,7 +14,7 @@ classdef World
         function obj = World(pathToMapImage, mapResolution, nRobots)
             obj.map = Map(pathToMapImage, mapResolution);
             
-            rng(4); % make deterministic
+            rng(2); % make deterministic
             
             normalInit = false; % initializes with a normal random var.
             
@@ -34,7 +34,7 @@ classdef World
                     if normalInit
                         position = max(min([(randn()*2 - 1); (randn()*2 - 1)] * width/2, width/2), -width/2);
                     else
-                        position = [(rand()*2 - 1); (rand()*2 - 1)] * width/2;
+                        position = [(rand()*2 - 1); (rand()*2 - 1)] * width/8;
                     end
                     
                     if ~obj.map.isRegionOccupied(position, Settings.ROBOT_RADIUS)

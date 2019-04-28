@@ -1,14 +1,10 @@
 % This script will run and visualize a simulated distributed multi-robot
 % exploration in a gps-denied environment.
 clear all
-w = World('simpleMap.png', 0.5, 2);
+w = World('Map1.png', 0.5, 8);
 
 vw = VideoWriter('test.avi');
 open(vw);
-
-f1 = figure;
-
-set(gcf, 'Position', [0,0,1000, 500])
 
 % logged variables
 time = [];
@@ -24,6 +20,11 @@ everyN = 10;
 
 
 dt = 1;
+
+%f1 = figure;
+
+%set(gcf, 'Position', [0,0,1000, 500])
+
 for t = (0:dt:6000)
     
     % log 
@@ -48,7 +49,7 @@ for t = (0:dt:6000)
         explored(1, end+1) = exPer;
     end
     
-    if exPer > 0.95
+    if exPer > 0.9
         break;
     end
     

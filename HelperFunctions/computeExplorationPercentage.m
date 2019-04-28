@@ -42,8 +42,8 @@ for row = (2:length(world.map.occupancyGrid)-1)
      end
 end
 
-freeGT;
-freeExplored;
+freeGT
+freeExplored
 
 percentage = freeExplored/freeGT
 
