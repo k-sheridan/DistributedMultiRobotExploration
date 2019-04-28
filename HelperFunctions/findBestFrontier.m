@@ -34,13 +34,15 @@ nFrontiers = 0;
 bestFrontierPosition = targetPosition;
 bestFrontierScore = realmax;
 
+T_G_R = robot.startingState.transformation() * robot.localState.transformation();
+
 for row = (rowLower:rowUpper)
     for col = (colLower:colUpper)
         if (robot.localMap.occupancyGrid(row, col) == OccupancyState.UNOCCUPIED) && any(any(robot.localMap.occupancyGrid(row-1:row+1, col-1:col+1) == OccupancyState.UNKOWN))
             % evaluate the score
             frontierPos = robot.localMap.mapIndex2Position(row, col);
             score = kPos * norm(frontierPos - robot.localState.pos) + kTarget * norm(frontierPos - targetPosition)...
-                + kLine * (robot.linesOfExploration.computeCost(robot.localState.pos));
+                + kLine * (robot.linesOfExploration.computeCost(T_G_R(1:2, 3)));
            
             
             if score < bestFrontierScore

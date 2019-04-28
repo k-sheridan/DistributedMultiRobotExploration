@@ -187,9 +187,20 @@ classdef Robot < handle
                 normal = -(T_local_me(1:2, 1:2)*center); % vec pointing toward me.
                 normal = normal/norm(normal);
                 
+                
                 if ~obj.linesOfExploration.hasLine(otherRobot.id)
-                    obj.linesOfExploration.addLine(pt, normal, otherRobot.id);
-                    fprintf('added line\n')
+                    if otherRobot.linesOfExploration.hasLine(obj.id)
+                    % take this robots line of exploration and just negate
+                    % it
+                    ln = otherRobot.linesOfExploration.lineMap(otherRobot.linesOfExploration.id2key(obj.id));
+                    obj.linesOfExploration.addLine(ln.Point, -ln.Normal, otherRobot.id);
+                    else
+                    % transform to global frame
+                    T_global_local = obj.startingState.transformation();
+                    
+                    obj.linesOfExploration.addLine(T_global_local(1:2, 1:2)*pt + T_global_local(1:2, 3), T_global_local(1:2, 1:2)*normal, otherRobot.id);
+                    fprintf('added line\n');
+                    end
                 end
             end
             
@@ -231,7 +242,7 @@ classdef Robot < handle
             
             if isempty(path)
                 % try once more to generate the path.
-                prm.NumNodes = Settings.PRM_NODES*10;
+                prm.NumNodes = Settings.PRM_NODES*2;
                 path = findpath(prm, start', goal');
                 
                 if isempty(path)

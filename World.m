@@ -14,14 +14,16 @@ classdef World
         function obj = World(pathToMapImage, mapResolution, nRobots)
             obj.map = Map(pathToMapImage, mapResolution);
             
-            rng(1); % make deterministic
+            rng(4); % make deterministic
+            
+            normalInit = false; % initializes with a normal random var.
             
             obj.t = 0;
             
             % create all robots
             obj.robots = {};
             obj.robotGroundTruthStates = {};
-            mapSize = length(obj.map.occupancyGrid)*2;
+            mapSize = length(obj.map.occupancyGrid)*3;
             for id = (1:nRobots)
                 obj.robots{id} = Robot(id, mapSize, mapResolution);
                 
@@ -29,7 +31,11 @@ classdef World
                 positionValid = false;
                 while (~positionValid)
                     width = length(obj.map.occupancyGrid) * mapResolution;
-                    position = [(rand()*2 - 1); (rand()*2 - 1)] * width/2;
+                    if normalInit
+                        position = max(min([(randn()*2 - 1); (randn()*2 - 1)] * width/2, width/2), -width/2);
+                    else
+                        position = [(rand()*2 - 1); (rand()*2 - 1)] * width/2;
+                    end
                     
                     if ~obj.map.isRegionOccupied(position, Settings.ROBOT_RADIUS)
                         positionValid = true;
