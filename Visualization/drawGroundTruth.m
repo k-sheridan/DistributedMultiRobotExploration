@@ -15,6 +15,17 @@ for rbt = world.robotGroundTruthStates
     drawRobot(rbt{1}, [1, 0, 0]);
 end
 
+% draw communication
+for rbt1 = world.robotGroundTruthStates
+    for rbt2 = world.robotGroundTruthStates
+        dist = norm(rbt1{1}.pos - rbt2{1}.pos)
+        if dist < Settings.COMM_RANGE && dist > 1e-16
+            A = [rbt1{1}.pos, rbt2{1}.pos]
+            line(A(1, 1:2), A(2, 1:2), 'Color', [0,1,0])
+        end
+    end
+end
+
 
 for idx = (1:length(world.robots))
     if ~isempty(world.robots{idx}.newestLidarMeasurement)
@@ -39,7 +50,7 @@ for idx = (1:length(world.robots))
         %         end
         
         %plot(pixels(1, :), pixels(2, :), 'r-')
-        plot(points(1, :), points(2, :), 'b-')
+        plot(points(1, :), points(2, :), 'Color', [0, 0, 1, 0.2])
         
     end
     

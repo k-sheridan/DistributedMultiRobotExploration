@@ -1,9 +1,9 @@
 % This script will run and visualize a simulated distributed multi-robot
 % exploration in a gps-denied environment.
 clear all
-w = World('Map1.png', 0.5, 8);
+w = World('Map1.png', 0.5, 4);
 
-vw = VideoWriter('test.avi');
+vw = VideoWriter('test.mp4', 'MPEG-4');
 open(vw);
 
 % logged variables
@@ -21,9 +21,9 @@ everyN = 10;
 
 dt = 1;
 
-%f1 = figure;
+f1 = figure;
 
-%set(gcf, 'Position', [0,0,1000, 500])
+set(gcf, 'Position', [0,0,2000, 1000])
 
 for t = (0:dt:6000)
     
@@ -49,36 +49,40 @@ for t = (0:dt:6000)
         explored(1, end+1) = exPer;
     end
     
-    if exPer > 0.9
+    if exPer > 0.90
         break;
     end
     
     
-%     figure(f1);
-%     clf
-%     
-%     
-%     subplot('Position', [0,0,0.5,1]);
-%     drawGroundTruth(w);
-%     subplot('Position', [0.5,0.5,0.25,0.5]);
-%     drawLocalMap(w.robots{1});
-%     subplot('Position', [0.5,0,0.25,0.5]);
-%     drawLocalMap(w.robots{2});
-%     subplot('Position', [0.75,0.5,0.25,0.5]);
-%     drawLocalMap(w.robots{3});
-%     subplot('Position', [0.75,0,0.25,0.5]);
-%     drawLocalMap(w.robots{4});
+     figure(f1);
+     clf
+     
+     
+    subplot('Position', [0,0,0.5,1]);
+    drawGroundTruth(w);
+    subplot('Position', [0.5,0.5,0.25,0.5]);
+    drawLocalMap(w.robots{1});
+    %drawPotentialFunction(w.robots{1});
+    subplot('Position', [0.5,0,0.25,0.5]);
+    drawLocalMap(w.robots{2});
+    %drawPotentialFunction(w.robots{2});
+    subplot('Position', [0.75,0.5,0.25,0.5]);
+    drawLocalMap(w.robots{3});
+    %drawPotentialFunction(w.robots{3});
+    subplot('Position', [0.75,0,0.25,0.5]);
+    drawLocalMap(w.robots{4});
+    %drawPotentialFunction(w.robots{4});
     
-%     
-%     drawnow;
-%     
-%     frame = getframe(gcf);
-%     writeVideo(vw,frame);
+    
+    drawnow;
+    
+    frame = getframe(gcf);
+    writeVideo(vw,frame);
 
 w.run(dt);
 
 end
 
 %save the vars.
-save('temp.mat', 'explored', 'time', 'globalTheta', 'globalX', 'globalY')
+%save('temp.mat', 'explored', 'time', 'globalTheta', 'globalX', 'globalY')
 

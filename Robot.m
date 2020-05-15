@@ -19,6 +19,8 @@ classdef Robot < handle
         % waypoints: [[x1;y1], [x2;y2], [x3;y3], ...] meters in local
         % frame.
         waypoints;
+        
+        pathValid;
     end
     
     methods
@@ -37,6 +39,8 @@ classdef Robot < handle
             obj.linesOfExploration = LinesOfExploration();
             
             obj.waypoints = [];
+            
+            obj.pathValid = false;
             
         end
         
@@ -199,6 +203,7 @@ classdef Robot < handle
                     T_global_local = obj.startingState.transformation();
                     
                     obj.linesOfExploration.addLine(T_global_local(1:2, 1:2)*pt + T_global_local(1:2, 3), T_global_local(1:2, 1:2)*normal, otherRobot.id);
+                    %obj.linesOfExploration.addLine(pt, normal, otherRobot.id);
                     fprintf('added line\n');
                     end
                 end
@@ -218,7 +223,6 @@ classdef Robot < handle
         function [waypoints] = generatePathPRM(obj, startingPos, goalPos)
             og = robotics.OccupancyGrid(double(obj.localMap.occupancyGrid) / double(OccupancyState.OCCUPIED), 1/obj.localMap.mapResolution);
             
-            
             R = [1,0; 0,-1];
             sz = size(obj.localMap.occupancyGrid);
             t = sz(1)*obj.localMap.mapResolution/2;
@@ -227,7 +231,7 @@ classdef Robot < handle
             goal = R*goalPos + t;
             
             % add buffer
-            %inflate(og, obj.localMap.mapResolution);
+            %inflate(og, 1, 'grid');
             
             setOccupancy(og, start', 0)
             setOccupancy(og, goal', 0)
@@ -242,12 +246,15 @@ classdef Robot < handle
             
             if isempty(path)
                 % try once more to generate the path.
-                prm.NumNodes = Settings.PRM_NODES*2;
+                prm.NumNodes = Settings.PRM_NODES*10;
                 path = findpath(prm, start', goal');
                 
                 if isempty(path)
                     fprintf('Failed to find valid path.')
+                    obj.pathValid = false;
                     path = [start, goal]';
+                else 
+                    obj.pathValid = true;
                 end
             end
             

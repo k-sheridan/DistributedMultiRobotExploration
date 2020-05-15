@@ -7,6 +7,7 @@ th = robot.startingState.theta;
 
 %tImg = imtranslate(imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])), robot.startingState.pos/robot.localMap.mapResolution);
 tImg = (imwarp(robot.localMap.occupancyGrid, affine2d([cos(th), sin(th), 0; -sin(th), cos(th), 0; 0, 0, 1])));
+%tImg = robot.localMap.occupancyGrid;
 
 sz = size(tImg);
 %assert(sz(1)==sz(2));

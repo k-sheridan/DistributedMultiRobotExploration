@@ -1,4 +1,4 @@
-classdef World
+classdef World < handle
     % Stores the ground truth of the world and all robot ground truth
     % positions.
     
@@ -8,15 +8,18 @@ classdef World
         robotGroundTruthStates % a cell array which serves as the absolute robot positons.
         startingStatesGroundTruth % cell array of initial states.
         t; % timer, seconds
+        ranOnce;
     end
     
     methods
         function obj = World(pathToMapImage, mapResolution, nRobots)
             obj.map = Map(pathToMapImage, mapResolution);
             
-            rng(2); % make deterministic
+            rng(5); % make deterministic
             
             normalInit = false; % initializes with a normal random var.
+            
+            obj.ranOnce = false;
             
             obj.t = 0;
             
@@ -34,14 +37,14 @@ classdef World
                     if normalInit
                         position = max(min([(randn()*2 - 1); (randn()*2 - 1)] * width/2, width/2), -width/2);
                     else
-                        position = [(rand()*2 - 1); (rand()*2 - 1)] * width/8;
+                        position = [(rand()*2 - 1); (rand()*2 - 1)] * width/4;
                     end
                     
                     if ~obj.map.isRegionOccupied(position, Settings.ROBOT_RADIUS)
                         positionValid = true;
                         
                         obj.robotGroundTruthStates{id} = RobotState([position; rand()*2*pi], diag([0;0;0]));
-                        obj.robotGroundTruthStates{id}.theta = 0;
+                        %obj.robotGroundTruthStates{id}.theta = 0;
                         
                         obj.startingStatesGroundTruth{id} = RobotState([obj.robotGroundTruthStates{id}.pos; obj.robotGroundTruthStates{id}.theta], diag([0;0;0]));
                     end
@@ -53,9 +56,12 @@ classdef World
         % main simulation running function. handles communication, sensing,
         % control, and simulation.
         function [] = run(obj, dt)
-            
+   
             % communicate
-            %obj.communicate();
+            if obj.ranOnce == true
+                obj.communicate()
+            end
+           
             
             % motion
             for idx = (1:length(obj.robots))
@@ -79,6 +85,8 @@ classdef World
             
             
             obj.t = obj.t + dt;
+            
+            obj.ranOnce = true;
             
         end
         
